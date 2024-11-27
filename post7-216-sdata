@@ -1,0 +1,111 @@
+#include <iostream> // untuk input dan output
+using namespace std;
+
+// Mendefinisikan kelas Node yang merepresentasikan elemen dalam linked list
+class Node {
+public:
+    int data;      // Data yang disimpan dalam node
+    Node* selanjutnya;    // Pointer yang menunjuk ke node berikutnya
+
+    // Konstruktor untuk membuat node baru
+    Node(int nilai) {
+        data = nilai;   // Set data dengan nilai yang diberikan
+        selanjutnya = nullptr; // Pointer selanjutnya di-set null pada awalnya
+    }
+};
+
+// Mendefinisikan kelas Antrian yang menggunakan circular linked list
+class Antrian {
+private:
+    Node* depan;   // Menunjuk ke depan antrian
+    Node* belakang;    // Menunjuk ke belakang antrian
+
+public:
+    // Konstruktor untuk inisialisasi antrian kosong
+    Antrian() {
+        depan = belakang = nullptr;  // Mengatur depan dan belakang ke nullptr
+    }
+
+    // Fungsi untuk menambah data (enqueue)
+    void tambah(int nilai) {
+        Node* nodeBaru = new Node(nilai);  // Membuat node baru dengan nilai yang diberikan
+        if (depan == nullptr) {  // Jika antrian masih kosong
+            depan = belakang = nodeBaru;  // Node baru menjadi depan dan belakang
+            nodeBaru->selanjutnya = depan;  // Node baru menunjuk kembali ke depan (circular)
+        } else {
+            belakang->selanjutnya = nodeBaru;   // Belakang menunjuk ke node baru
+            belakang = nodeBaru;         // Belakang di-update ke node baru
+            belakang->selanjutnya = depan;     // Belakang menunjuk kembali ke depan (circular)
+        }
+    }
+
+    // Fungsi untuk menghapus data (dequeue)
+    void hapus() {
+        if (depan == nullptr) {  // Jika antrian kosong
+            cout << "Antrian kosong, tidak dapat melakukan hapus.\n";
+            return;
+        }
+
+        // Jika hanya ada satu elemen dalam antrian
+        if (depan == belakang) {
+            delete depan;  // Menghapus elemen
+            depan = belakang = nullptr;  // Mengatur depan dan belakang ke nullptr
+        } else {
+            Node* sementara = depan;  // Menyimpan node depan
+            depan = depan->selanjutnya; // Memindahkan depan ke node berikutnya
+            belakang->selanjutnya = depan;  // Belakang menunjuk ke node depan yang baru
+            delete sementara;         // Menghapus node yang lama (depan)
+        }
+    }
+
+    // Fungsi untuk menampilkan elemen dalam antrian
+    void tampilkan() {
+        if (depan == nullptr) {  // Jika antrian kosong
+            cout << "Antrian kosong.\n";
+            return;
+        }
+
+        Node* sementara = depan;  // Mulai dari depan
+        cout << "Elemen dalam antrian: ";
+        do {
+            cout << sementara->data << " ";  // Menampilkan data node
+            sementara = sementara->selanjutnya;  // Pindah ke node berikutnya
+        } while (sementara != depan);  // Berhenti jika kembali ke depan
+        cout << endl;
+    }
+};
+
+// Fungsi utama untuk menjalankan program
+int main() {
+    Antrian a;  // Membuat objek antrian
+    int jumlahElemen, nilai;
+
+    // Meminta pengguna untuk memasukkan jumlah elemen yang ingin dimasukkan ke antrian
+    cout << "Masukkan jumlah elemen yang ingin dimasukkan ke antrian: ";
+    cin >> jumlahElemen;
+
+    // Memasukkan elemen ke dalam antrian berdasarkan jumlah yang dimasukkan
+    for (int i = 0; i < jumlahElemen; ++i) {
+        cout << "Masukkan elemen ke-" << (i + 1) << ": ";
+        cin >> nilai;  // Membaca input nilai dari pengguna
+        a.tambah(nilai);  // Menambah nilai ke dalam antrian
+    }
+
+    // Menampilkan isi antrian setelah input
+    cout << "Isi antrian setelah input: ";
+    a.tampilkan();
+
+    // Menghapus elemen dari antrian
+    a.hapus();  // Menghapus elemen pertama
+    cout << "Setelah hapus: ";
+    a.tampilkan();
+
+    // Meminta pengguna untuk memasukkan elemen baru setelah hapus
+    cout << "Masukkan elemen baru setelah hapus: ";
+    cin >> nilai;
+    a.tambah(nilai);  // Menambah elemen baru
+    cout << "Setelah tambah elemen baru: ";
+    a.tampilkan();
+
+    return 0;  // Mengakhiri program
+}
